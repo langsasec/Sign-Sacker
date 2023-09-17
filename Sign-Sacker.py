@@ -1,12 +1,15 @@
 import io
 import struct
+import subprocess
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QFileDialog, QVBoxLayout, \
-    QWidget, QMessageBox
+    QWidget, QMessageBox, QCheckBox
 import sys
 import os
 import shutil
 from PyQt5.QtWidgets import QDesktopWidget
+
 
 
 class SignSacker(QMainWindow):
@@ -54,6 +57,21 @@ class SignSacker(QMainWindow):
         self.output_entry = QLineEdit(self)
         layout.addWidget(self.output_entry)
 
+        self.icon_checkbox = QCheckBox("掠夺受害者高清图标（默认保存在'文件名_ico'路径下）", self)
+        self.details_checkbox = QCheckBox("掠夺受害者所有详细信息（右键属性->详细信息。包括文件说明，文件版本等）", self)
+        layout.addWidget(self.icon_checkbox)
+        layout.addWidget(self.details_checkbox)
+        self.output_label= QLabel("------------------------------------------------------------------------------------", self)
+        layout.addWidget(self.output_label)
+        self.output_label = QLabel("温馨提示：", self)
+        layout.addWidget(self.output_label)
+        self.output_label= QLabel("1.掠夺后语言默认为英语(美国)。", self)
+        layout.addWidget(self.output_label)
+        self.output_label= QLabel("2.掠夺后图标若无变化请粘贴到新的文件夹刷新即可。", self)
+        layout.addWidget(self.output_label)
+        self.output_label= QLabel("------------------------------------------------------------------------------------", self)
+        layout.addWidget(self.output_label)
+
         self.process_button = QPushButton("生成文件", self)
         layout.addWidget(self.process_button)
         self.process_button.clicked.connect(self.process_files)
@@ -99,7 +117,7 @@ class SignSacker(QMainWindow):
             # 自动填充生成文件名的文本框
             base_name = os.path.basename(file_name)
             output_file = os.path.splitext(base_name)[0] + "-Signed.exe"
-            self.output_entry.setText(output_file)
+            self.output_entry.setText(os.getcwd().replace('\\','/')+'/'+output_file)
 
     def process_files(self):
         file1_path = self.file1_entry.text()
@@ -121,8 +139,15 @@ class SignSacker(QMainWindow):
         if not output_file.endswith(".exe"):
             self.show_message_box("错误", "生成的文件必须是.exe文件！")
             return
+        icon = self.icon_checkbox.isChecked()
+        version_info = self.details_checkbox.isChecked()
+        if version_info:
+            info_sacker(file1_path, file2_path)
+        if icon:
+            ico_sacker(file1_path,file2_path)
         writeCert(copyCert(file1_path), file2_path, output_file)
         message = f"签名已写入：{output_file}"
+
         self.show_message_box("生成文件", message)
 
     def show_message_box(self, title, message):
@@ -252,6 +277,56 @@ def writeCert(cert, exe, output):
             f.seek(0, io.SEEK_END)
             f.write(cert)
 
+# 图标掠夺
+def ico_sacker(victim, sacker):
+    save_location = f"{victim}_ico"
+    os.system('ico_sacker.exe /save "'+victim+'" "'+save_location+'" -icons')
+    ico_path= save_location+'/'+os.listdir(save_location)[0]
+    os.system(f'info_sacker.exe {sacker}  --set-icon {ico_path}')
+
+
+def get_version_string(file_path, string_name):
+    import warnings
+    try:
+        warnings.filterwarnings("ignore")
+        cmd = f'info_sacker.exe {file_path} --get-version-string "{string_name}"'
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        version_string = result.stdout.strip()
+        return version_string
+    except:
+        pass
+
+
+def set_version_string(file_path, string_name, string_value):
+    try:
+        subprocess.check_call(f'info_sacker.exe {file_path} --set-version-string "{string_name}" "{string_value}"',
+                              shell=True)
+    except:
+        pass
+
+
+def info_sacker(victim, sacker):
+    version_strings = {
+        "FileDescription": "",
+        "FileVersion": "",
+        "ProductName": "",
+        "ProductVersion": "",
+        "CompanyName": "",
+        "LegalCopyright": "",
+        "InternalName": "",
+        "OriginalFilename": ""
+    }
+
+    # 获取版本信息
+    for string_name in version_strings:
+        version_strings[string_name] = get_version_string(victim, string_name)
+
+    # 设置版本信息
+    for string_name, string_value in version_strings.items():
+        if string_value is not None:
+            set_version_string(sacker, string_name, string_value)
+
+    os.system(f'info_sacker.exe {sacker} --set-file-version {version_strings["FileVersion"]}')
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = SignSacker()
