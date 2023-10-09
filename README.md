@@ -4,6 +4,7 @@
   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=langsasec/Sign-Sacker&type=Date" />
   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=langsasec/Sign-Sacker&type=Date" />
 </picture>
+
 # Sign-Sacker (签名掠夺者) - 2.0
 
 ## 介绍
