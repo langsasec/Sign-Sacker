@@ -1,5 +1,11 @@
 # Sign-Sacker (签名掠夺者) - 2.0
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=langsasec/Sign-Sacker&type=Date&theme=dark" />
+  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=langsasec/Sign-Sacker&type=Date" />
+  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=langsasec/Sign-Sacker&type=Date" />
+</picture>
+
 ## 介绍
 
 Sign-Sacker(签名掠夺者)：一款数字签名复制器，可将其他官方exe中数字签名，图标，详细信息复制到没有签名的exe中，作为免杀，权限维持，伪装的一种小手段。
@@ -31,7 +37,6 @@ Sign-Sacker(签名掠夺者)：一款数字签名复制器，可将其他官方e
 ### 详细信息对比
 唯一的遗憾是语言暂未更改，文件版本号是由于飞书实际和显示有差别，大多数是一致的，因此我未做细微调整。
 ![image](https://github.com/langsasec/Sign-Sacker/assets/45072131/c96a2202-54cb-4086-9979-22037fcd1fea)
-
 
 
 
