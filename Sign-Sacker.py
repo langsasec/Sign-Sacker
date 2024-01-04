@@ -69,6 +69,8 @@ class SignSacker(QMainWindow):
         layout.addWidget(self.output_label)
         self.output_label= QLabel("2.掠夺后图标若无变化请粘贴到新的文件夹刷新即可。", self)
         layout.addWidget(self.output_label)
+        self.output_label= QLabel("3.建议对掠夺者进行备份再执行程序。", self)
+        layout.addWidget(self.output_label)
         self.output_label= QLabel("------------------------------------------------------------------------------------", self)
         layout.addWidget(self.output_label)
 
@@ -106,17 +108,21 @@ class SignSacker(QMainWindow):
 
 
     def choose_file1(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "选择文件1", "", "Executable Files (*.exe)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "选择文件1", "", "Executable Files (*.exe *.dll)")
         if file_name:
             self.file1_entry.setText(file_name)
 
     def choose_file2(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "选择文件2", "", "Executable Files (*.exe)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "选择文件2", "", "Executable Files (*.exe *.dll)")
         if file_name:
             self.file2_entry.setText(file_name)
             # 自动填充生成文件名的文本框
             base_name = os.path.basename(file_name)
-            output_file = os.path.splitext(base_name)[0] + "-Signed.exe"
+            extension = os.path.splitext(base_name)[1]
+            if extension.lower() == ".dll":
+                output_file = os.path.splitext(base_name)[0] + "-Signed.dll"
+            else:
+                output_file = os.path.splitext(base_name)[0] + "-Signed.exe"
             self.output_entry.setText(os.getcwd().replace('\\','/')+'/'+output_file)
 
     def process_files(self):
@@ -129,15 +135,6 @@ class SignSacker(QMainWindow):
             return
         if not os.path.exists(file2_path) or not os.path.isfile(file2_path):
             self.show_message_box("错误", "文件2无效！")
-            return
-        if not file1_path.endswith(".exe"):
-            self.show_message_box("错误", "文件1必须是.exe文件！")
-            return
-        if not file2_path.endswith(".exe"):
-            self.show_message_box("错误", "文件2必须是.exe文件！")
-            return
-        if not output_file.endswith(".exe"):
-            self.show_message_box("错误", "生成的文件必须是.exe文件！")
             return
         icon = self.icon_checkbox.isChecked()
         version_info = self.details_checkbox.isChecked()
